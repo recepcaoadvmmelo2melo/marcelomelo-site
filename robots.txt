@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://marcelomelo.adv.br/sitemap.xml
