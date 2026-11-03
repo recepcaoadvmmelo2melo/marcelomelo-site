@@ -18,12 +18,24 @@
 
     gtag('config', 'AW-18177757357');
 
-    /* Registra a conversão quando a página de obrigado é carregada */
-    gtag('event', 'conversion', {
-      'send_to': 'AW-18177757357/CXzCCM3Mss8cEK2h6ttD',
-      'value': 1.0,
-      'currency': 'BRL'
-    });
+    /* Contabiliza somente o retorno de um formulário iniciado neste navegador.
+       O redirecionamento do provedor não comprova entrega na caixa de e-mail. */
+    (function () {
+      try {
+        var key = 'marcelo_pending_form';
+        var pending = JSON.parse(sessionStorage.getItem(key) || 'null');
+        if (!pending || typeof pending.id !== 'string' ||
+            !['divorcio', 'guarda'].includes(pending.source) ||
+            typeof pending.created !== 'number' || Date.now() < pending.created ||
+            Date.now() - pending.created > 24 * 60 * 60 * 1000) return;
+        sessionStorage.removeItem(key);
+        gtag('event', 'conversion', {
+          send_to: 'AW-18177757357/CXzCCM3Mss8cEK2h6ttD',
+          value: 1.0, currency: 'BRL', transaction_id: pending.id,
+          contact_type: 'form_return', contact_source: pending.source
+        });
+      } catch (_) { /* A página permanece utilizável sem armazenamento. */ }
+    })();
   </script>
 
   <style>
@@ -134,7 +146,7 @@
         Falar pelo WhatsApp
       </a>
 
-      <a class="btn secundario" href="https://marcelomelo.adv.br/divorcio">
+      <a class="btn secundario" href="https://marcelomelo.adv.br/divorcio.html">
         Voltar para a página
       </a>
     </div>
