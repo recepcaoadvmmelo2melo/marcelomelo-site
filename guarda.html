@@ -280,5 +280,36 @@
       if(phone){phone.addEventListener('input',function(e){var value=e.target.value.replace(/\D/g,'').slice(0,11);if(value.length<=10){value=value.replace(/(\d{0,2})(\d{0,4})(\d{0,4})/,function(_,a,b,c){return(a?'('+a:'')+(a.length===2?') ':'')+b+(c?'-'+c:'');});}else{value=value.replace(/(\d{0,2})(\d{0,5})(\d{0,4})/,function(_,a,b,c){return(a?'('+a:'')+(a.length===2?') ':'')+b+(c?'-'+c:'');});}e.target.value=value;});}
     });
   </script>
+
+<script>
+/* Medição de intenção de contato; não comprova conversa ou contratação. */
+(function () {
+  'use strict';
+  var conversion = 'AW-18177757357/CXzCCM3Mss8cEK2h6ttD';
+  var source = location.pathname.indexOf('guarda') !== -1 ? 'guarda' : 'divorcio';
+  var clicked = false;
+  function id() { return 'contato-' + Date.now() + '-' + Math.random().toString(36).slice(2); }
+  document.addEventListener('click', function (event) {
+    var link = event.target.closest && event.target.closest('a[href]');
+    if (!link || !/^https:\/\/(wa\.me|api\.whatsapp\.com)\//i.test(link.href)) return;
+    if (clicked) return;
+    clicked = true;
+    setTimeout(function () { clicked = false; }, 1500);
+    if (typeof gtag === 'function') {
+      gtag('event', 'conversion', {send_to: conversion, value: 1.0, currency: 'BRL',
+        transaction_id: id(), contact_type: 'whatsapp_click', contact_source: source,
+        transport_type: 'beacon'});
+    }
+    /* A navegação nativa continua mesmo com a tag bloqueada. */
+  });
+  document.querySelectorAll('form[action^="https://formsubmit.co/"]').forEach(function (form) {
+    form.addEventListener('submit', function () {
+      try { sessionStorage.setItem('marcelo_pending_form', JSON.stringify({id: id(), source: source, created: Date.now()})); }
+      catch (_) { /* O envio deve continuar mesmo sem armazenamento. */ }
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
